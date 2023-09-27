@@ -25,24 +25,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------
-Button Driver
-This driver is built for buttons that have a pull up resistor between the
-button and the processor pin (i.e. the input is "High"/"1" when the button is
-not pressed) and will be connected to ground when the button is pressed (i.e.
-the input is "Low" / "0" when the button is pressed)
-Software API:
-Button(pin)
-- Provide pin that the button monitors
-is_pressed()
-- Return a boolean value (i.e. True/False) on if button is pressed
-- Function consumes no time
-wait_for_press(function=None)
-- Wait for the button to be pressed
-- Optionally takes in an argument "function" which is the function
-to be executed when waiting for the button to be pressed
-- Function consumes time
-- Returns a tuple:
-(<time button was pressed>, <data returned by the "function" argument>)
+Onboard USB Blinker
+This program simply blinks onboard LED 3 based on a frequency set in the code.
+That is really it.
 """
 
 import Adafruit_BBIO.GPIO as GPIO
@@ -53,6 +38,7 @@ freq = 5
 
 while True:
     GPIO.output("USR3", GPIO.HIGH)
-    time.sleep((1/freq)/2)
+    time.sleep((1/freq)/2) #Takes the inverse of the frequency and divides it by 2,
+                           #Such that the LED completes a cycle at the allotted freq
     GPIO.output("USR3", GPIO.LOW)
     time.sleep((1/freq)/2)
