@@ -58,7 +58,12 @@ operators = {
     "+" : operator.add,
     '-' : operator.sub,
     '*' : operator.mul,
-    '/' : operator.truediv
+    '/' : operator.truediv,
+    '>>' : operator.rshift,
+    '<<' : operator.lshift,
+    '%' : operator.mod,
+    '**' : operator.pow,
+    
 }
 # ------------------------------------------------------------------------
 # Functions
@@ -70,8 +75,8 @@ def get_user_input():
     """
     
     try:
-        number1 = float(input("Enter the first number : "))
-        number2 = float(input("Enter the second number: "))
+        number1 = int(input("Enter the first number : "))
+        number2 = int(input("Enter the second number: "))
         op = input("Enter function (either +,-,*, or /): ")
         func = operators.get(op)
     except:
