@@ -53,6 +53,7 @@ Error conditions:
 # NOTE - Global variable to map an operator string (e.g. "+") to
 # NOTE - the appropriate function.
 import operator
+import sys
 
 operators = {
     "+" : operator.add,
@@ -73,7 +74,10 @@ def get_user_input():
     Returns tuple: (number, number, function) or
     (None, None, None) if inputs invalid
     """
-    
+    if sys.version_info[0] >= 3:
+        get_input = input
+    else:
+        get_input = raw_input  
     try:
         number1 = int(input("Enter the first number : "))
         number2 = int(input("Enter the second number: "))
@@ -98,6 +102,6 @@ if __name__ == "__main__":
     while True:
         (num1,num2,func) = get_user_input()
         if (num1 == None) or (num2 == None) or (func == None):
-            pirnt('invalid input')
+            print('invalid input')
             break
         print(func(num1,num2))

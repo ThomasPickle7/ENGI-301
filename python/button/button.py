@@ -3,7 +3,7 @@
 Button Driver
 --------------------------------------------------------------------------
 License:   
-Copyright 2021-2023 - <Your Name>
+Copyright 2021-2023 - Thomas Pickell
 
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions are met:
@@ -124,7 +124,7 @@ class Button():
         # HW#4 TODO: (one line of code)
         #   Remove "pass" and return the comparison of input value of the GPIO pin of 
         #   the buton (i.e. self.pin) to the "pressed value" of the class 
-        return self.pin == 1
+        return self.pressed_value == GPIO.input('P2_2')
 
     # End def
 
@@ -161,7 +161,7 @@ class Button():
         #   GPIO pin of the buton (i.e. self.pin) to the "unpressed value" 
         #   of the class (i.e. we are executing the while loop while the 
         #   button is not being pressed)
-        while(self.pin == 0):
+        while(is_pressed(self) == False):
         
             if function is not None:
                 function_return_value = function()
@@ -179,7 +179,7 @@ class Button():
         #   GPIO pin of the buton (i.e. self.pin) to the "pressed value" 
         #   of the class (i.e. we are executing the while loop while the 
         #   button is being pressed)
-        while(self.pin == 1):
+        while(is_pressed(self) == True):
             time.sleep(self.sleep_time)
         
         # Compute the button_press_time

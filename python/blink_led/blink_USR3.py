@@ -34,7 +34,7 @@ import Adafruit_BBIO.GPIO as GPIO
 import time
 
 GPIO.setup("USR3", GPIO.OUT)
-freq = 5
+freq = .5
 
 while True:
     GPIO.output("USR3", GPIO.HIGH)
