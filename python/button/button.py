@@ -93,8 +93,8 @@ class Button():
         # By default the unpressed_value is "1" and the pressed
         # value is "0".  This is done to make it easier to change
         # in the future
-        self.unpressed_value = 1
-        self.pressed_value   = 0
+        self.unpressed_value = 0
+        self.pressed_value   = 1
         
         # By default sleep time is "0.1" seconds
         self.sleep_time      = 0.1
