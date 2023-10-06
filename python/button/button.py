@@ -97,7 +97,7 @@ class Button():
         self.pressed_value   = 1
         
         # By default sleep time is "0.1" seconds
-        self.sleep_time      = 0.1
+        self.sleep_time      = .001
 
         # Initialize the hardware components        
         self._setup()
