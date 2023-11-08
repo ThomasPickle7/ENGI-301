@@ -1,6 +1,6 @@
 """
 --------------------------------------------------------------------------
-Combination Lock
+Clock
 --------------------------------------------------------------------------
 License:   
 Copyright 2023 - Thomas Pickell
@@ -33,11 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Use the following hardware components to make a programmable combination lock:  
   - HT16K33 Display
-  - Button
+  - 3 Buttons
   - Red LED
   - Green LED
-  - Potentiometer (analog input)
-  - Servo
 
 Requirements:
   - Hardware:
@@ -63,18 +61,13 @@ import time
 
 import ht16k33       as HT16K33
 import button        as BUTTON
-import potentiometer as POT
-import servo         as SERVO
 import led           as LED
 
 # ------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------
 
-SERVO_LOCK         = 100     # Fully anti-clockwise
-SERVO_UNLOCK       = 0       # Fully clockwise
-
-POT_DIVIDER        = 8       # Divider used to help reduce potentiometer granularity
+# None
 
 # ------------------------------------------------------------------------
 # Global variables
@@ -86,7 +79,7 @@ POT_DIVIDER        = 8       # Divider used to help reduce potentiometer granula
 # Functions / Classes
 # ------------------------------------------------------------------------
 
-class CombinationLock():
+class Clock():
     """ CombinationLock """
     reset_time     = None
     button         = None
@@ -97,21 +90,17 @@ class CombinationLock():
     display        = None
     debug          = None
     
-    def __init__(self, reset_time=2.0, button="P2_2", 
-                       red_led="P2_6", green_led="P2_4",
-                       potentiometer="P1_19", servo="P1_36", 
+    def __init__(self, reset_time=2.0, button0="P2_2", 
+                       button1="P2_6", button2="P2_4",
                        i2c_bus=1, i2c_address=0x70):
         """ Initialize variables and set up display """
 
         self.reset_time     = reset_time
-        self.button         = BUTTON.Button(button)
-        self.red_led        = LED.LED(red_led)
-        self.green_led      = LED.LED(green_led)
-        self.potentiometer  = POT.Potentiometer(potentiometer)
-        self.servo          = SERVO.Servo(servo, default_position=SERVO_LOCK)
+        self.button0         = BUTTON.Button(button0)
+        self.button1         = BUTTON.Button(button1)
+        self.button2         = BUTTON.Button(button2)
         self.display        = HT16K33.HT16K33(i2c_bus, i2c_address)
         self.debug          = False
-        
         self._setup()
     
     # End def
@@ -142,7 +131,6 @@ class CombinationLock():
         self.green_led.off()
         
         # Set servo to "locked"
-        self.servo.turn(SERVO_LOCK)
     # End def
 
 
