@@ -1,86 +1,32 @@
-import smbus	
-import math#import SMBus module of I2C
-from time import sleep          #import
+# -*- coding: utf-8 -*-
+#!/usr/bin/python3
+#https://github.com/Thinary/AHT10/blob/master/src/Thinary_AHT10.cpp
+#https://myhydropi.com/raspberry-pi-i2c-temperature-sensor
+#i2cdetect -y 0
+import smbus
+import time
 
-#some MPU6050 Registers and their Address
-PWR_MGMT_1   = 0x6B
-SMPLRT_DIV   = 0x19
-CONFIG       = 0x1A
-GYRO_CONFIG  = 0x1B
-INT_ENABLE   = 0x38
-ACCEL_XOUT_H = 0x3B
-ACCEL_YOUT_H = 0x3D
-ACCEL_ZOUT_H = 0x3F
-GYRO_XOUT_H  = 0x43
-GYRO_YOUT_H  = 0x45
-GYRO_ZOUT_H  = 0x47
-
-
-def MPU_Init():
-	#write to sample rate register
-	bus.write_byte_data(Device_Address, SMPLRT_DIV, 7)
-	
-	#Write to power management register
-	bus.write_byte_data(Device_Address, PWR_MGMT_1, 1)
-	
-	#Write to Configuration register
-	bus.write_byte_data(Device_Address, CONFIG, 0)
-	
-	#Write to Gyro configuration register
-	bus.write_byte_data(Device_Address, GYRO_CONFIG, 24)
-	
-	#Write to interrupt enable register
-	bus.write_byte_data(Device_Address, INT_ENABLE, 1)
-
-def read_raw_data(addr):
-	#Accelero and Gyro value are 16-bit
-        high = bus.read_byte_data(Device_Address, addr)
-        low = bus.read_byte_data(Device_Address, addr+1)
-    
-        #concatenate higher and lower value
-        value = ((high << 8) | low)
-        
-        #to get signed value from mpu6050
-        if(value > 32768):
-                value = value - 65536
-        return value
+# Get I2C bus
+bus = smbus.SMBus(2)
+config = [0x08, 0x00]
+bus.write_i2c_block_data(0x38, 0xE1, config)
+time.sleep(1)
+byt = bus.read_byte(0x38)
+print(byt&0x68)
 
 
-bus = smbus.SMBus(1) 	# or bus = smbus.SMBus(0) for older version boards
-Device_Address = 0x68   # MPU6050 device address
+MeasureCmd = [0x33, 0x00]
+bus.write_i2c_block_data(0x38, 0xAC, MeasureCmd)
+time.sleep(0.5)
+data = bus.read_i2c_block_data(0x38,0x00)
+print(data)
 
-MPU_Init()
 
-print (" Reading Data of Gyroscope and Accelerometer")
-step_count = 0
-prev_mag = 0
-while True:
-	
-	#Read Accelerometer raw value
-	acc_x = read_raw_data(ACCEL_XOUT_H)
-	acc_y = read_raw_data(ACCEL_YOUT_H)
-	acc_z = read_raw_data(ACCEL_ZOUT_H)
-	
-	#Read Gyroscope raw value
-	gyro_x = read_raw_data(GYRO_XOUT_H)
-	gyro_y = read_raw_data(GYRO_YOUT_H)
-	gyro_z = read_raw_data(GYRO_ZOUT_H)
-	
-	#Full scale range +/- 250 degree/C as per sensitivity scale factor
-	Ax = acc_x/16384.0
-	Ay = acc_y/16384.0
-	Az = acc_z/16384.0
-	
-	Gx = gyro_x/131.0
-	Gy = gyro_y/131.0
-	Gz = gyro_z/131.0
-	
-	Amag = math.sqrt(Gx * Gx + Gy * Gy + Gz * Gz)
-	
-	if (prev_mag > Amag + .1 and prev_mag > 1.5):
-		step_count += 1
-	prev_mag = Amag
-	
+temp = ((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5]
+ctemp = ((temp*200) / 1048576) - 50
 
-	print ("Gx=%.2f" %Gx, u'\u00b0'+ "/s", "\tGy=%.2f" %Gy, u'\u00b0'+ "/s", "\tGz=%.2f" %Gz, u'\u00b0'+ "/s", "Amagx=%.2f" %Amag, u'\u00b0'+ "/s", "\tAx=%.2f g" %Ax, "\tAy=%.2f g" %Ay, "\tAz=%.2f g" %Az, "\tStep Count:z=%.2f g" %step_count) 	
-	sleep(.3)
+print(u'Temperature: {0:.1f}C'.format(ctemp))
+tmp = ((data[1] << 16) | (data[2] << 8) | data[3]) >> 4
+#print(tmp)
+ctmp = int(tmp * 100 / 1048576)
+print(u'Humidity: {0}%'.format(ctmp))

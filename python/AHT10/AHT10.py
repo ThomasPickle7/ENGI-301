@@ -1,6 +1,6 @@
 """
 --------------------------------------------------------------------------
-HT16K33 I2C Library
+AHT10 SMBUS Library
 --------------------------------------------------------------------------
 License:   
 Copyright 2018-2023 <NAME>
@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------
 Software API:
 
-  HT16K33(bus, address=0x70)
+  PU6050(bus, address=0x68)
     - Provide i2c bus that dispaly is on
     - Provide i2c address for the display
     
@@ -56,29 +56,14 @@ Software API:
 --------------------------------------------------------------------------
 Background Information: 
  
-  * Using seven-segment digit LED display for Adafruit's HT16K33 I2C backpack:
-    * http://adafruit.com/products/878
-    * https://learn.adafruit.com/assets/36420
-    * https://cdn-shop.adafruit.com/datasheets/ht16K33v110.pdf
-    
-    * Base code (adapted below):
-        * https://github.com/emcconville/HT16K33/blob/master/FourDigit.py
-        * https://github.com/emcconville/HT16K33/blob/master/_HT16K33.py
-        * https://github.com/adafruit/Adafruit_Python_LED_Backpack/blob/master/Adafruit_LED_Backpack/HT16K33.py
-        * https://github.com/adafruit/Adafruit_Python_LED_Backpack/blob/master/Adafruit_LED_Backpack/SevenSegment.py
-        * https://github.com/adafruit/Adafruit_Python_LED_Backpack/blob/master/examples/sevensegment_test.py
-
-    * Letters Supported from:
-        * https://en.wikichip.org/wiki/seven-segment_display/representing_letters
-        
+  
 """
-class HT16K33():
-    """ Class to manage a HT16K33 I2C display """
-    # Class variables
-    bus     = None
-    address = None
-    command = None
-    
+import smbus	#import SMBus module of I2C
+import math
+from time import sleep 
+
+
+class AHT10:
     def __init__(self, bus, address=0x38):
         """ Initialize class variables; Set up display; Set display to blank """
         
@@ -89,15 +74,46 @@ class HT16K33():
 
         self.bus = bus
         self.address = address
-        self.command = "/usr/sbin/i2cset -y {0} {1}".format(bus, address)
-
-        # Set up display        
-
-        # Set display to blank
+        self.setup()
+        # Set up MPU       
+    
+    def setup(self):
+        config = [0x08, 0x00]
+        self.bus.write_i2c_block_data(0x38, 0xE1, config)
         
-    def _setup(self):
-        """ Setup the hardware components. """
-        # Initialize Button
-        # HW#4 TODO: (one line of code)
-        #   Remove "pass" and use the Adafruit_BBIO.GPIO library to set up the button
-        GPIO.setup(self.pin, GPIO.IN)
+        
+    def read_raw_data(self):
+    	#Accelero and Gyro value are 16-bit
+        MeasureCmd = [0x33, 0x00]
+        self.bus.write_i2c_block_data(0x38, 0xAC, MeasureCmd)
+        return self.bus.read_i2c_block_data(0x38,0x00) #data
+            
+        
+    def celsius(self):  
+        data = self.read_raw_data()
+        temp = ((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5]
+        return ((temp*200) / 1048576) - 50
+    
+    
+    def farenheit(self):
+        return self.celsius() * (9/5) + 32
+        
+        
+    def humidity(self):
+        data = self.read_raw_data()
+        hum = ((data[1] << 16) | (data[2] << 8) | data[3]) >> 4
+        return int(hum * 100 / 1048576)
+    
+
+if __name__ == '__main__':
+    print (" Reading Data of Gyroscope and Accelerometer")
+
+    temp = AHT10(smbus.SMBus(1), 0x38)
+    while True:
+    	c = temp.celsius()
+    	f = temp.farenheit()
+    	h = temp.humidity()
+    
+    	print ("Celsius=%.2f" %c, u'\u00b0'+ "/s", "\tFarenheit=%.2f" %f, "\tHumidity=%.2f" %h, u'\u00b0'+ "/s",)
+    	sleep(1)
+    
