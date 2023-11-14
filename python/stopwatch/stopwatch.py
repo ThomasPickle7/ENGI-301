@@ -59,8 +59,6 @@ Uses:
 """
 import time
 
-import button
-
 class Stopwatch:
     def __init__(self, hours=0, minutes=0, seconds=0):
         self.hours = hours
@@ -89,6 +87,6 @@ class Stopwatch:
 test_watch = Stopwatch()
 test_watch.turned_on(True)
 while True:
-    time.sleep(.01)
+    time.sleep(1)
     test_watch.increment()
     test_watch.print_time()
