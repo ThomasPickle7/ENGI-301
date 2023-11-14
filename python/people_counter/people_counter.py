@@ -74,7 +74,7 @@ class PeopleCounter():
     def __init__(self, reset_time=2.0, button="P2_2", i2c_bus=1, i2c_address=0x70):
         """ Initialize variables and set up display """
         self.reset_time = reset_time
-        self.button     = BUTTON.Button(button)
+        self.button     = BUTTON.Button(button, sleep_time =.01)
         self.display    = HT16K33.HT16K33(i2c_bus, i2c_address)
         
         self._setup()

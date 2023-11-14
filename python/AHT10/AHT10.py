@@ -114,6 +114,6 @@ if __name__ == '__main__':
     	f = temp.farenheit()
     	h = temp.humidity()
     
-    	print ("Celsius=%.2f" %c, u'\u00b0'+ "/s", "\tFarenheit=%.2f" %f, "\tHumidity=%.2f" %h, u'\u00b0'+ "/s",)
+    	print ("Celsius=%.2f" %c, u'\u00b0'+ "/s", "\tFarenheit=%.2f" %f, "\tHumidity=%.2f" %h, u'\u00b0'+ "/s")
     	sleep(1)
     

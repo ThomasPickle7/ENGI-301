@@ -58,6 +58,7 @@ Uses:
 
 """
 import time
+import smbus
 
 class Stopwatch:
     def __init__(self, hours=0, minutes=0, seconds=0):
