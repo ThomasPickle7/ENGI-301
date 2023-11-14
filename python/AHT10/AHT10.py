@@ -103,17 +103,27 @@ class AHT10:
         data = self.read_raw_data()
         hum = ((data[1] << 16) | (data[2] << 8) | data[3]) >> 4
         return int(hum * 100 / 1048576)
+        
+    def run(self, faren):
+        while True:
+            c = self.celsius()
+            f = self.farenheit()
+            h = self.humidity()
+            if faren:
+                return"T=%.2f" %f+u'\u00b0'+" RH=%.2f" %h
+            else:
+                return "T=%.2f" %c+u'\u00b0'+ " RH=%.2f" %h
+            
     
 
 if __name__ == '__main__':
     print (" Reading Data of Gyroscope and Accelerometer")
 
     temp = AHT10(smbus.SMBus(1), 0x38)
-    while True:
-    	c = temp.celsius()
-    	f = temp.farenheit()
-    	h = temp.humidity()
     
-    	print ("Celsius=%.2f" %c, u'\u00b0'+ "/s", "\tFarenheit=%.2f" %f, "\tHumidity=%.2f" %h, u'\u00b0'+ "/s")
-    	sleep(1)
+    while True:
+        text = temp.run(False)
+        print(text)
+        sleep(.5)
+    
     

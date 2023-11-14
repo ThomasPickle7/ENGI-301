@@ -1,9 +1,9 @@
 """
 --------------------------------------------------------------------------
-Watch
+People Counter
 --------------------------------------------------------------------------
 License:   
-Copyright 2023 Thomas Pickell
+Copyright 2023 <Name>
 
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions are met:
@@ -48,6 +48,8 @@ import Adafruit_BBIO.GPIO as GPIO
 import button as BUTTON
 import smbus
 import SSD1306
+import AHT10
+import MPU6050
 
 # ------------------------------------------------------------------------
 # Constants
@@ -67,32 +69,52 @@ import SSD1306
 
 class Watch():
     """ People Counter """
+    reset_time = None
     button_set     = None
     button_toggle = None
+    display    = None
+    weather  = None
+    gyro = None
+    bus = None
+    mode = None
     mil_time = False
     second_count = 0
     min_count = 0
     hour_count = 0
     meridian = True #True = AM, False = PM
-    set_min = True #True = increment minutes, False = increment hours
-    def __init__(self, mil_time, button_set="P2_2", button_toggle = "P2_4", i2c_bus = smbus.SMBus(1)):
+    set_min = True #True = increment minutes, False =- increment hours
+    def __init__(self, mil_time, reset_time=2.0, button_set="P2_2", button_toggle = "P2_4", i2c_bus = smbus.SMBus(1)):
         """ Initialize variables and set up display """
+        self.reset_time = reset_time
         self.button_set     = BUTTON.Button(button_set)
         self.button_toggle = BUTTON.Button(button_toggle)
+        self.display    = SSD1306.SSD1306(0x3c)
+        self.gyro       = MPU6050.MPU6050(i2c_bus, 0x68)
+        self.weather    = AHT10.AHT10(i2c_bus, 0x38)
+        self.mode = True #True = toggle seconds, False = toggle hours
         self.mil_time = mil_time
-        if(mil_time): # Changes the clock's interpretation of midnight/noon based on preferred configuration
+        self._setup()
+        if(mil_time): # Number of people to be displayed
             self.hour_count = 0
         else:
-            self.hour_count = 12
-         
+            self.hour_count = 12 # Number of people to be displayed
+         #True=AM, False = PM
     
     # End def
     
+    
+    def _setup(self):
+        """Setup the hardware components."""
+        # Initialize Display
+        
+        self.display.blank()
+        print("People Counter setup()")
 
     # End def
 
     def increment(self, wait):
-        """Synchronously updates the time"""
+      """Synchronously updates the time""""
+      
         time.sleep(wait)
         self.second_count += 1
         if(self.second_count == 60):
@@ -111,7 +133,7 @@ class Watch():
         
     
     def toggle(self, wait):
-        """Allows the user to toggle the hours and minutes on the clock based on the state of the toggle bbutton"""
+      """Allows the user to toggle the hours and minutes on the clock based on the state of the toggle bbutton"""
         i=0
         period = 1 - wait
         while i  < (period * 10):
@@ -134,11 +156,10 @@ class Watch():
                     self.min_count = 0
                 if(self.hour_count == 60):
                     self.hour_count += 1
-                    if (self.hour_count % 12 == 0):
-                        self.meridian = not self.meridian 
                 if ((not self.mil_time) and (self.hour_count == 13 or self.hour_count == 25)):
                     self.hour_count = 1
-                 
+                if (self.hour_count % 12 == 0):
+                    self.meridian = not self.meridian  
                 if (self.mil_time and self.hour_count == 24):
                     self.hour_count = 0
                         
@@ -150,7 +171,11 @@ class Watch():
             
         
     def display_time(self):
-        """Returns a string version of the current time."""
+<<<<<<<<< saved version
+
+=========
+        """Increments the clock."""
+>>>>>>>>> local version
             
             # Update the display
         if(self.meridian):
@@ -197,12 +222,16 @@ if __name__ == '__main__':
     watch = Watch(False)
     display = SSD1306.SSD1306(0x3c)
     period = 10
-    freq = 1/period
+    freq = 1/freq
     try:
         # Run the people counter
         while (True):
-            watch.increment(freq)
-            watch.toggle(freq)
+<<<<<<<<< saved version
+
+=========
+            watch.increment(period)
+            watch.toggle(period)
+>>>>>>>>> local version
             text = watch.display_time()
             print(text)
             display.update_text(text)

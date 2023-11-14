@@ -77,6 +77,8 @@ GYRO_ZOUT_H  = 0x47
 
 
 class MPU6050:
+    step_count = 0
+    prev_mag = 0
     def __init__(self, bus, address=0x68):
         """ Initialize class variables; Set up display; Set display to blank """
         
@@ -84,7 +86,6 @@ class MPU6050:
         print("MPU6050:")
         print("    Bus     = {0}".format(bus))
         print("    Address = 0x{0:x}".format(address))
-
         self.bus = bus
         self.address = address
 
@@ -142,40 +143,42 @@ class MPU6050:
         Ax, Ay, Az = self.accel()
         Gx, Gy, Gz = self.gyro()
         return math.sqrt(Gx * Gx + Gy * Gy + Gz * Gz)
-        
+    def run(self):
     
+        
+        while True:
+    	
+    	
+    	    #Read Accelerometer raw value
+    	    acc_x = self.read_raw_data(ACCEL_XOUT_H)
+    	    acc_y = self.read_raw_data(ACCEL_YOUT_H)
+    	    acc_z = self.read_raw_data(ACCEL_ZOUT_H)
+    	
+    	    #Read Gyroscope raw value
+    	    gyro_x = self.read_raw_data(GYRO_XOUT_H)
+    	    gyro_y = self.read_raw_data(GYRO_YOUT_H)
+    	    gyro_z = self.read_raw_data(GYRO_ZOUT_H)
+    	
+    	    #Full scale range +/- 250 degree/C as per sensitivity scale factor
+    	    Ax, Ay, Az = self.accel()
+    	
+    	    Gx, Gy, Gz = self.gyro()
+    	
+    	    Amag = self.gMag()
+    	
+    	
+    	    if (self.prev_mag > Amag + .01 and self.prev_mag > .02):
+    		    self.step_count += 1
+    	    self.prev_mag = Amag
+    	    return self.step_count	
+    	    
 
 if __name__ == '__main__':
     print (" Reading Data of Gyroscope and Accelerometer")
-    step_count = 0
-    prev_mag = 0
-    gyro = MPU6050(smbus.SMBus(1), 0x68)
-    while True:
-    	
-    	
-    	#Read Accelerometer raw value
-    	acc_x = gyro.read_raw_data(ACCEL_XOUT_H)
-    	acc_y = gyro.read_raw_data(ACCEL_YOUT_H)
-    	acc_z = gyro.read_raw_data(ACCEL_ZOUT_H)
-    	
-    	#Read Gyroscope raw value
-    	gyro_x = gyro.read_raw_data(GYRO_XOUT_H)
-    	gyro_y = gyro.read_raw_data(GYRO_YOUT_H)
-    	gyro_z = gyro.read_raw_data(GYRO_ZOUT_H)
-    	
-    	#Full scale range +/- 250 degree/C as per sensitivity scale factor
-    	Ax, Ay, Az = gyro.accel()
-    	
-    	Gx, Gy, Gz = gyro.gyro()
-    	
-    	Amag = gyro.gMag()
-    	
-    	
-    	if (prev_mag > Amag + .01 and prev_mag > .02):
-    		step_count += 1
-    	prev_mag = Amag
-    	
     
-    	print ("Gx=%.2f" %Gx, u'\u00b0'+ "/s", "\tGy=%.2f" %Gy, u'\u00b0'+ "/s", "\tGz=%.2f" %Gz, u'\u00b0'+ "/s", "Amag=%.2f" %Amag, u'\u00b0'+ "/s", "\tAx=%.2f g" %Ax, "\tAy=%.2f g" %Ay, "\tAz=%.2f g" %Az, "\tStep Count:z=%.2f g" %step_count) 	
-    	sleep(.3)
+    gyro = MPU6050(smbus.SMBus(1), 0x68)
+    while(True):
+        var = gyro.run()
+        print(var)
+        sleep(.3)
     
