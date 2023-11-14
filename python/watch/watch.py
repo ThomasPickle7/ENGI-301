@@ -111,8 +111,6 @@ class Watch():
             if(self.min_count == 60):
                 self.hour_count += 1
                 self.min_count = 0
-                if(self.min_count == 60):
-                    self.hour_count += 1
                 if ((not self.mil_time) and (self.hour_count == 13)):
                     self.hour_count = 1
                     self.meridian = not self.meridian
@@ -168,7 +166,6 @@ class Watch():
             meri_text = " AM"
         else:
             meri_text = " PM"
-        
         if(self.second_count < 10):
             second_text = "0" + str(self.second_count)
         else:
@@ -208,13 +205,13 @@ if __name__ == '__main__':
     # Create instantiation of the watch and display
     watch = Watch(False)
     display = SSD1306.SSD1306(0x3c)
-    freq = 10
-    period = 1/freq
+    period = 10
+    freq = 1/freq
     try:
         # Run the people counter
         while (True):
-            watch.increment(period)
-            watch.toggle(period)
+            watch.increment(freq)
+            watch.toggle(freq)
             text = watch.display_time()
             print(text)
             display.update_text(text)
