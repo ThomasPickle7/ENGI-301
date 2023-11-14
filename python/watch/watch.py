@@ -48,8 +48,6 @@ import Adafruit_BBIO.GPIO as GPIO
 import button as BUTTON
 import smbus
 import SSD1306
-import AHT10
-import MPU6050
 
 # ------------------------------------------------------------------------
 # Constants
