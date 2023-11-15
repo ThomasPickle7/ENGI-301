@@ -1,6 +1,6 @@
 """
 --------------------------------------------------------------------------
-Watch
+Smart Watch
 --------------------------------------------------------------------------
 License:   
 Copyright 2023 Thomas Pickell
@@ -45,9 +45,13 @@ import time
 import multiprocessing
 import Adafruit_BBIO.GPIO as GPIO
 
-import button as BUTTON
 import smbus
 import SSD1306
+import AHT10
+import MPU6050
+import button as BUTTON
+import watch as WATCH
+import pedometer as PED
 
 # ------------------------------------------------------------------------
 # Constants
@@ -65,111 +69,49 @@ import SSD1306
 # Functions / Classes
 # ------------------------------------------------------------------------
 
-class Watch():
+class SmartWatch():
     """ People Counter """
-    button_set     = None
-    button_toggle = None
-    mil_time = False
-    second_count = 0
-    min_count = 0
-    hour_count = 0
-    meridian = True #True = AM, False = PM
-    set_min = True #True = increment minutes, False = increment hours
-    def __init__(self, mil_time, button_set="P2_2", button_toggle = "P2_4", i2c_bus = smbus.SMBus(1)):
+    ped = None
+    watch = None
+    time = None
+    toggle_button = None
+    display = None
+    time_screen = True #True= show time, False = show fitness data
+    def __init__(self, button_address = "P2_6", i2c_bus = smbus.SMBus(1)):
         """ Initialize variables and set up display """
-        self.button_set     = BUTTON.Button(button_set)
-        self.button_toggle = BUTTON.Button(button_toggle)
-        self.mil_time = mil_time
-        if(mil_time): # Changes the clock's interpretation of midnight/noon based on preferred configuration
-            self.hour_count = 0
-        else:
-            self.hour_count = 12
+        self.toggle_button = BUTTON.Button("P2_6")
+        self.ped = PED.Pedometer(False)
+        self.watch = WATCH.Watch(False)
+        self.display = SSD1306.SSD1306(0x3c)
+        
+        
          
     
     # End def
-    
 
     # End def
 
-    def increment(self):
+    def get_data(self):
         """Synchronously updates the time"""
         while True:
-            self.second_count += 1
-            return self.second_count
-
-                     
+            return self.ped.get_data()
         
-    
-    def toggle(self):
-        """Allows the user to toggle the hours and minutes on the clock based on the state of the toggle bbutton"""
-        
+    def get_time(self):
         while True:
-            button_press_toggle = self.button_toggle.is_pressed()
-            
-            button_press_set = self.button_set.is_pressed()
-            
-            if(button_press_toggle):
-                self.set_min = not self.set_min
-
-            if(button_press_set):
-                if (self.set_min):
-                    self.min_count += 1
-                else:
-                    self.hour_count += 1
-            return (self.min_count, self.hour_count)
-            
-            
-    def time(self):
+            self.watch.time()
+            return self.watch.display_time()
+    def choose(self):
         while True:
-            seconds = self.increment()
-            (mins, hrs) = self.toggle()
-            if(seconds >= 60):
-                self.min_count += 1
-                self.second_count = 0
-            if(mins >= 60):
-                self.hour_count += 1
-                self.min_count = 0
-                if ((not self.mil_time) and (self.hour_count == 12 or self.hour_count == 24)):
-                    self.hour_count = 1
-                    self.meridian = not self.meridian
-                if (self.mil_time and self.hour_count == 23):
-                    self.hour_count = 0
-                   
-            return (hrs, mins, seconds)
+            button_pressed = self.toggle_button.is_pressed()
+            time = self.get_time()
+            data = self.get_data()
+            if(button_pressed):
+                self.time_screen = not self.time_screen
+            if self.time_screen:
+                return time
+            else:
             
-        
-    def display_time(self):
-        """Returns a string version of the current time."""
-            
-            # Update the display
-        if(self.meridian):
-            meri_text = " AM"
-        else:
-            meri_text = " PM"
-        if(self.second_count < 10):
-            second_text = "0" + str(self.second_count)
-        else:
-            second_text = str(self.second_count)
-        
-        if(self.min_count < 10):
-            min_text = "0" + str(self.min_count)
-        else:
-            min_text = str(self.min_count)
-            
-        if(self.hour_count < 10):
-            hour_text = "0" + str(self.hour_count)
-        else:
-            hour_text = str(self.hour_count)
-                
-        text = hour_text + ":" + min_text + ":" + second_text + meri_text
-        return text
-
-    # End def
-    def cleanup(self):
-        """Setup the hardware components."""
-        # Initialize Display
-        
-        self.display.update_text("DEAD!")
+                return data
 # End class
 
 
@@ -183,22 +125,19 @@ if __name__ == '__main__':
     print("Program Start")
 
     # Create instantiation of the watch and display
-    watch = Watch(False)
+    swatch = SmartWatch(False)
     display = SSD1306.SSD1306(0x3c)
-    
     try:
         # Run the people counter
         while (True):
-            timing = watch.time()
-            disp_text = watch.display_time()
-            display.update_text(disp_text)
-            print(disp_text)
+
+            disp = swatch.choose()
+            print(disp)
+            display.update_text(disp)
             time.sleep(1)
-            
 
     except KeyboardInterrupt:
         # Clean up hardware when exiting
-        watch.run(True)
-
+            display.blank()
     print("Program Complete")
 
