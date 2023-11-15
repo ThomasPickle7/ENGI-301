@@ -30,15 +30,30 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------
+Software API:
 
-Use the HT16K33 Display and a button to create a digital people counter
+  Watch(bus, address=0x70)
+    - Provide i2c bus that dispaly is on
+    - Provide i2c address for the display
+    
+    increment()
+      - Sets value of display to "0000"
+    
+    toggle()
+      - Turns off all LEDs on display
+    
+    time(enable)
+      - Turns on / off the colon on the display.  Enable must be True/False.
+    
+    display_time(value)
+      - Update the value on the display.  Value must be between 0 and 9999.
 
-Requirements:
-  - Increment the counter by one each time the button is pressed
-  - If button is held for more than 2s, reset the counter
-
-Uses:
-  - HT16K33 display library developed in class
+    text(value)
+      - Update the value on the display with text.
+        The following characters are supported:
+            "abcdefghijlnopqrstuyABCDEFGHIJLNOPQRSTUY? -"
+  
+--------------------------------------------------------------------------
 
 """
 import time
@@ -121,6 +136,7 @@ class Watch():
             
     def time(self):
         while True:
+          #Allows the incremented and toggled time to be added in parallel
             seconds = self.increment()
             (mins, hrs) = self.toggle()
             if(seconds >= 60):
@@ -164,12 +180,7 @@ class Watch():
         text = hour_text + ":" + min_text + ":" + second_text + meri_text
         return text
 
-    # End def
-    def cleanup(self):
-        """Setup the hardware components."""
-        # Initialize Display
-        
-        self.display.update_text("DEAD!")
+
 # End class
 
 
