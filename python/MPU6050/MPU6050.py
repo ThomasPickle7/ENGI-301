@@ -3,7 +3,7 @@
 MPU6050 I2C Library
 --------------------------------------------------------------------------
 License:   
-Copyright 2018-2023 <NAME>
+Copyright 2018-2023 Thomas Pickell
 
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions are met:
