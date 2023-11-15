@@ -32,23 +32,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------
 Software API:
 
-  PU6050(bus, address=0x68)
+  MPU6050(bus, address=0x68)
     - Provide i2c bus that dispaly is on
     - Provide i2c address for the display
     
-    clear()
+    MPU_init()
       - Sets value of display to "0000"
     
-    blank()
+    read_raw_data(addr)
       - Turns off all LEDs on display
     
-    set_colon(enable)
+    accel(enable)
       - Turns on / off the colon on the display.  Enable must be True/False.
     
-    update(value)
+    gyro()
       - Update the value on the display.  Value must be between 0 and 9999.
 
-    text(value)
+    gMag(value)
       - Update the value on the display with text.
         The following characters are supported:
             "abcdefghijlnopqrstuyABCDEFGHIJLNOPQRSTUY? -"
@@ -144,7 +144,9 @@ class MPU6050:
         Gx, Gy, Gz = self.gyro()
         return math.sqrt(Gx * Gx + Gy * Gy + Gz * Gz)
     def run(self):
-    
+        """
+        determines whether or not a step has been made
+        """
         
         while True:
     	
