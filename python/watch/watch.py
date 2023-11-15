@@ -37,21 +37,16 @@ Software API:
     - Provide i2c address for the display
     
     increment()
-      - Sets value of display to "0000"
+      - Increments the clock by 1 second
     
     toggle()
-      - Turns off all LEDs on display
+      - Increments the hours and minutes on the clock baseed on user inputs
     
     time(enable)
-      - Turns on / off the colon on the display.  Enable must be True/False.
+      - determines the time based on user inputs and time elapsed since startup
     
     display_time(value)
-      - Update the value on the display.  Value must be between 0 and 9999.
-
-    text(value)
-      - Update the value on the display with text.
-        The following characters are supported:
-            "abcdefghijlnopqrstuyABCDEFGHIJLNOPQRSTUY? -"
+      - converts the time on the clock to a string
   
 --------------------------------------------------------------------------
 
