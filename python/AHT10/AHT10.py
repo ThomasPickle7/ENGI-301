@@ -32,26 +32,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------
 Software API:
 
-  PU6050(bus, address=0x68)
+  AHT10(bus, address=0x68)
     - Provide i2c bus that dispaly is on
     - Provide i2c address for the display
     
-    clear()
+    setup()
       - Sets value of display to "0000"
     
-    blank()
+    get_raw_data()
       - Turns off all LEDs on display
     
-    set_colon(enable)
-      - Turns on / off the colon on the display.  Enable must be True/False.
-    
-    update(value)
-      - Update the value on the display.  Value must be between 0 and 9999.
-
-    text(value)
-      - Update the value on the display with text.
-        The following characters are supported:
-            "abcdefghijlnopqrstuyABCDEFGHIJLNOPQRSTUY? -"
+    farenheit()
+      - Reads and calcualtes the temperature in degrees Farenheit from sensor data
+      
+    celsius()
+      - Reads and calcualtes the temperature in degrees Celsius from sensor data
+      
+    humidity()
+      - reads and calculates the humidity value from raw sensor data
+      
+    run()
+      - Returns the text version of the humidity and desired temperature
   
 --------------------------------------------------------------------------
 Background Information: 
@@ -78,37 +79,43 @@ class AHT10:
         # Set up MPU       
     
     def setup(self):
+      #Writes on the sensor to begin measuring data
         config = [0x08, 0x00]
         self.bus.write_i2c_block_data(0x38, 0xE1, config)
         
         
     def read_raw_data(self):
-    	#Accelero and Gyro value are 16-bit
+    	#Notifies the sensor that data is going to be read, then reads said data
         MeasureCmd = [0x33, 0x00]
         self.bus.write_i2c_block_data(0x38, 0xAC, MeasureCmd)
         return self.bus.read_i2c_block_data(0x38,0x00) #data
             
         
     def celsius(self):  
+        # interprets the temperature data in terms of degrees celsius
         data = self.read_raw_data()
         temp = ((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5]
         return ((temp*200) / 1048576) - 50
     
     
     def farenheit(self):
+      #simply converts the celsius temperature to farenheit
         return self.celsius() * (9/5) + 32
         
         
     def humidity(self):
+      # interprets the temperature data in terms of humidity percentage
         data = self.read_raw_data()
         hum = ((data[1] << 16) | (data[2] << 8) | data[3]) >> 4
         return int(hum * 100 / 1048576)
         
     def run(self, faren):
+      # runs the previous methods, then formats them to a text format
         while True:
             c = self.celsius()
             f = self.farenheit()
             h = self.humidity()
+          
             if faren:
                 return"T=%.2f" %f+u'\u00b0'+" RH=%.2f" %h
             else:
@@ -122,7 +129,7 @@ if __name__ == '__main__':
     temp = AHT10(smbus.SMBus(1), 0x38)
     
     while True:
-        text = temp.run(False)
+        text = temp.run(False) # Running the command with False
         print(text)
         sleep(.5)
     
