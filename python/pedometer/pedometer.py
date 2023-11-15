@@ -30,16 +30,14 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------
+Software API:
 
-Use the HT16K33 Display and a button to create a digital people counter
+  Pedometer()
 
-Requirements:
-  - Increment the counter by one each time the button is pressed
-  - If button is held for more than 2s, reset the counter
-
-Uses:
-  - HT16K33 display library developed in class
-
+  get_data()
+  -returns the data of the pedometer(step count, temperature, and humidity)
+  
+--------------------------------------------------------------------------
 """
 import time
 import multiprocessing
