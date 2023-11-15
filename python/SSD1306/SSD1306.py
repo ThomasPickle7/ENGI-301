@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 --------------------------------------------------------------------------
-HT16K33 I2C Library
+SSD1306 I2C Library
 --------------------------------------------------------------------------
 License:   
-Copyright 2018-2023 <NAME>
+Copyright 2018-2023 Thomas Pickell
 
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions are met:
@@ -33,44 +33,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------
 Software API:
 
-  HT16K33(bus, address=0x70)
+  SSD1306(bus, address=0x70)
     - Provide i2c bus that dispaly is on
     - Provide i2c address for the display
     
-    clear()
-      - Sets value of display to "0000"
-    
     blank()
-      - Turns off all LEDs on display
+      - Clears the display
     
-    set_colon(enable)
-      - Turns on / off the colon on the display.  Enable must be True/False.
-    
-    update(value)
-      - Update the value on the display.  Value must be between 0 and 9999.
+    update_text(text)
+      - Writes text in the center of the display
 
-    text(value)
-      - Update the value on the display with text.
-        The following characters are supported:
-            "abcdefghijlnopqrstuyABCDEFGHIJLNOPQRSTUY? -"
+    
   
---------------------------------------------------------------------------
-Background Information: 
- 
-  * Using seven-segment digit LED display for Adafruit's HT16K33 I2C backpack:
-    * http://adafruit.com/products/878
-    * https://learn.adafruit.com/assets/36420
-    * https://cdn-shop.adafruit.com/datasheets/ht16K33v110.pdf
-    
-    * Base code (adapted below):
-        * https://github.com/emcconville/HT16K33/blob/master/FourDigit.py
-        * https://github.com/emcconville/HT16K33/blob/master/_HT16K33.py
-        * https://github.com/adafruit/Adafruit_Python_LED_Backpack/blob/master/Adafruit_LED_Backpack/HT16K33.py
-        * https://github.com/adafruit/Adafruit_Python_LED_Backpack/blob/master/Adafruit_LED_Backpack/SevenSegment.py
-        * https://github.com/adafruit/Adafruit_Python_LED_Backpack/blob/master/examples/sevensegment_test.py
-
-    * Letters Supported from:
-        * https://en.wikichip.org/wiki/seven-segment_display/representing_letters
+------------------------------------------------------------------------
         
 """
 import board
@@ -86,8 +61,6 @@ oled_reset = None
 # Constants
 # ------------------------------------------------------------------------
 
-# See https://en.wikipedia.org/wiki/Seven-segment_display for reference 
-
 WIDTH = 128
 HEIGHT = 32  # Change to 64 if needed
 BORDER = 5
@@ -97,7 +70,6 @@ BORDER = 5
 # Functions / Classes
 # ------------------------------------------------------------------------
 class SSD1306():
-    """ Class to manage a HT16K33 I2C display """
     # Class variables
     
     
@@ -109,6 +81,7 @@ class SSD1306():
         self.i2c = board.I2C()  # uses board.SCL and board.SDA
         self.oled = adafruit_ssd1306.SSD1306_I2C(WIDTH, HEIGHT, self.i2c, addr=0x3C, reset=None)
         
+        #creates an image that will be drawn on the LCD Screen
         self.image = Image.new("1", (self.oled.width, self.oled.height))
         self.draw = ImageDraw.Draw(self.image)
 
@@ -149,14 +122,6 @@ class SSD1306():
             
     # End def
     
-    def border(self):
-        """ Update the value on the display with text
-        
-        :param value:  Value must have between 1 and 4 characters
-        
-        Will throw a ValueError if there are not the appropriate number of 
-        characters or if characters are used that are not supported.
-        """
         
 
 # End class
