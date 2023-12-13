@@ -1,9 +1,9 @@
 """
 --------------------------------------------------------------------------
-People Counter
+Pedometer
 --------------------------------------------------------------------------
 License:   
-Copyright 2023 <Name>
+Copyright 2023 Thomas Pickell
 
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions are met:
@@ -30,24 +30,23 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------
+Software API:
 
-Use the HT16K33 Display and a button to create a digital people counter
+  Pedometer()
 
-Requirements:
-  - Increment the counter by one each time the button is pressed
-  - If button is held for more than 2s, reset the counter
-
-Uses:
-  - HT16K33 display library developed in class
-
+  get_data()
+  -returns the data of the pedometer(step count, temperature, and humidity)
+  
+--------------------------------------------------------------------------
 """
 import time
-
+import multiprocessing
 import Adafruit_BBIO.GPIO as GPIO
 
-import ht16k33 as HT16K33
-import button as BUTTON
-
+import smbus
+import SSD1306
+import AHT10
+import MPU6050
 
 # ------------------------------------------------------------------------
 # Constants
@@ -65,68 +64,38 @@ import button as BUTTON
 # Functions / Classes
 # ------------------------------------------------------------------------
 
-class PeopleCounter():
+class Pedometer():
     """ People Counter """
-    reset_time = None
-    button     = None
     display    = None
-    
-    def __init__(self, reset_time=2.0, button="P2_2", i2c_bus=1, i2c_address=0x70):
+    gyro = None
+    temp = None
+    weather = None
+    steps = None
+    degree = False #False = Temp in Celsius, True = Temp in Farenheit
+    def __init__(self, degree, i2c_bus = smbus.SMBus(1)):
         """ Initialize variables and set up display """
-        self.reset_time = reset_time
-        self.button     = BUTTON.Button(button, sleep_time =.01)
-        self.display    = HT16K33.HT16K33(i2c_bus, i2c_address)
+        self.temp     = AHT10.AHT10(i2c_bus, 0x38)
+        self.gyro = MPU6050.MPU6050(i2c_bus, 0x68)
+        self.degree = degree
         
-        self._setup()
+         
     
     # End def
-    
-    
-    def _setup(self):
-        """Setup the hardware components."""
-        # Initialize Display
-        self.display.clear()
-        print("People Counter setup()")
 
     # End def
 
-
-    def run(self):
-        """Execute the main program."""
-        people_count                 = 0        # Number of people to be displayed
-        button_press_time            = 0.0      # Time button was pressed (in seconds)
+    def get_data(self):
+        """Synchronously updates the time"""
+        while True:
+            self.steps = self.gyro.run()
+            self.weather = self.temp.run(self.degree)
+            return str(self.steps)+", "+self.weather
         
-        while(1):
-            # Wait for button press
-            button_press_time = self.button.wait_for_press()[0]
-            # Record time
-            print("Time button was pressed for: ", button_press_time)
-            # Wait for button release
+        
             
-            # Compare time to increment or reset people_count
-            if(button_press_time < self.reset_time):
-                if people_count < HT16K33.HT16K33_MAX_VALUE:
-                    people_count += 1
-                else:
-                    people_count = 0
-            else:
-                people_count = 0
-            # Update the display
-            self.display.update(people_count)
-
-    # End def
-
-    
-    def cleanup(self):
-        """Cleanup the hardware components."""
+            
+            
         
-        # Set Display to something unique to show program is complete
-        self.display.text("DEAD")
-        
-        # Button does not need any cleanup code
-        
-    # End def
-
 # End class
 
 
@@ -139,16 +108,21 @@ if __name__ == '__main__':
 
     print("Program Start")
 
-    # Create instantiation of the people counter
-    people_counter = PeopleCounter()
-
+    # Create instantiation of the watch and display
+    ped = Pedometer(False)
+    display = SSD1306.SSD1306(0x3c)
+    
     try:
         # Run the people counter
-        people_counter.run()
+        while (True):
+
+            text = ped.get_data()
+            print(text)
+            display.update_text(text)
+            time.sleep(.3)
 
     except KeyboardInterrupt:
         # Clean up hardware when exiting
-        people_counter.cleanup()
-
+            display.blank()
     print("Program Complete")
 

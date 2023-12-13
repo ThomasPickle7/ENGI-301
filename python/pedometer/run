@@ -35,19 +35,17 @@
 # 
 # --------------------------------------------------------------------------
 
-cd /var/lib/cloud9/ENGI-301/python/combo_lock
+cd /var/lib/cloud9/ENGI-301/python/pedometer
 
 ./configure_pins.sh
 
 dirs=(
-    '/var/lib/cloud9/ENGI-301/python/ht16k33:'
-    '/var/lib/cloud9/ENGI-301/python/servo:'
-    '/var/lib/cloud9/ENGI-301/python/button:'
-    '/var/lib/cloud9/ENGI-301/python/led:'
-    '/var/lib/cloud9/ENGI-301/python/potentiometer:'
+    '/var/lib/cloud9/ENGI-301/python/MPU6050:'
+    '/var/lib/cloud9/ENGI-301/python/AHT10:'
+    '/var/lib/cloud9/ENGI-301/python/SSD1306:'
 )
 
-PYTHONPATH=$(IFS=; echo "${dirs[*]}") python3 combo_lock.py
+PYTHONPATH=$(IFS=; echo "${dirs[*]}") python3 pedometer.py
 
 
 

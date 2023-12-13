@@ -1,9 +1,9 @@
 #!/bin/bash
 # --------------------------------------------------------------------------
-# Combination Lock - Run Script
+# Watch - Configure Pins
 # --------------------------------------------------------------------------
 # License:   
-# Copyright 2020 Erik Welsh
+# Copyright 2023 <Name>
 # 
 # Redistribution and use in source and binary forms, with or without 
 # modification, are permitted provided that the following conditions are met:
@@ -31,23 +31,17 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # --------------------------------------------------------------------------
 # 
-# Run Combination Lock in /var/lib/cloud9/ENGI301/python/combo_lock
+# Configure pins for digital people counter:
+#   - I2C1
+#   - Button
 # 
 # --------------------------------------------------------------------------
 
-cd /var/lib/cloud9/ENGI-301/python/combo_lock
+# I2C1
+config-pin P2_09 i2c
+config-pin P2_11 i2c
 
-./configure_pins.sh
-
-dirs=(
-    '/var/lib/cloud9/ENGI-301/python/ht16k33:'
-    '/var/lib/cloud9/ENGI-301/python/servo:'
-    '/var/lib/cloud9/ENGI-301/python/button:'
-    '/var/lib/cloud9/ENGI-301/python/led:'
-    '/var/lib/cloud9/ENGI-301/python/potentiometer:'
-)
-
-PYTHONPATH=$(IFS=; echo "${dirs[*]}") python3 combo_lock.py
-
-
-
+# Button
+config-pin P2_02 gpio
+config-pin P2_04 gpio
+config-pin P2_06 gpio

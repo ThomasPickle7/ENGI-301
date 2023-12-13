@@ -241,9 +241,9 @@ class CombinationLock():
                 # Wait for button press (do nothing)
                 self.button.wait_for_press()
                 # Get combination
-                combo_attempt = self.input_combination()
+                combination = self.input_combination()
                 # Lock the lock
-                self.lock
+                self.lock()
                 # Set program lock to False
                 program = False
 
@@ -268,10 +268,10 @@ class CombinationLock():
                     
                 # Unlock the lock
                 self.unlock()
-                button_press_time = self.unlock()
+                button_press_time = self.button.wait_for_press()
                 # Wait for button press (get press time)
                 # If greater than reset_time, program lock, else lock the lock
-                if (button_press_time > self.reset_time):
+                if (button_press_time[0] > self.reset_time):
                     program = True
                 else:
                     self.lock()
@@ -313,7 +313,7 @@ class CombinationLock():
         self.display.text("DEAD")
 
         # Clean up hardware
-        # self.button.cleanup()
+        self.button.cleanup()
         self.red_led.cleanup()
         self.green_led.cleanup()
         self.potentiometer.cleanup()

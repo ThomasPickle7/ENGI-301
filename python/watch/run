@@ -35,19 +35,20 @@
 # 
 # --------------------------------------------------------------------------
 
-cd /var/lib/cloud9/ENGI-301/python/combo_lock
+cd /var/lib/cloud9/ENGI-301/python/watch
 
 ./configure_pins.sh
 
 dirs=(
-    '/var/lib/cloud9/ENGI-301/python/ht16k33:'
-    '/var/lib/cloud9/ENGI-301/python/servo:'
+    '/var/lib/cloud9/ENGI-301/python/MPU6050:'
+    '/var/lib/cloud9/ENGI-301/python/AHT10:'
+    '/var/lib/cloud9/ENGI-301/python/SSD1306:'
+    '/var/lib/cloud9/ENGI-301/python/clock:'
+    '/var/lib/cloud9/ENGI-301/python/alarm:'
     '/var/lib/cloud9/ENGI-301/python/button:'
-    '/var/lib/cloud9/ENGI-301/python/led:'
-    '/var/lib/cloud9/ENGI-301/python/potentiometer:'
 )
 
-PYTHONPATH=$(IFS=; echo "${dirs[*]}") python3 combo_lock.py
+PYTHONPATH=$(IFS=; echo "${dirs[*]}") python3 watch.py
 
 
 
