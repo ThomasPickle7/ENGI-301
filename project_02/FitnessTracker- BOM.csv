@@ -1,0 +1,8 @@
+Qty,Value,Device,Package,Parts,Description
+5,1K,R_R0603,R0603,"R1, R2, R3, R4, R5"," 1k Ohm Resistor, American symbol"
+1,1M,R_R0603,R0603,R6,"1M OhmResistor, American Symbol"
+1,AHT10,AHT10,MA04-1,U$4,Temperature and Humidity Sensor
+1,MPU6050,MPU6050,MA04-1,U$3,3-Axis Gyroscope and Accelerometer
+1,POCKETBEAGLE,POCKETBEAGLE,POCKETBEAGLE,U$1,Pocketbeagle Computer
+3,PUSH_BUTTON,PUSH_BUTTON,BUTTON_12.5MM,"SW1, SW2, SW3",12.5MM push-buttons
+1,SSD1306,SSD1306,MA04-1,U$2,128x32 2-color OLED Screen
