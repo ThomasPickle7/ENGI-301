@@ -8,3 +8,4 @@ SSD1306
 pedometer
 watch
 smart_watch
+Hackster Link: https://www.hackster.io/tap5/fitrack-381149
